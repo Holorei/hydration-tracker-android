@@ -32,7 +32,7 @@ The structure module used follows the guidelines of a clean architecture by divi
 - [ ] Create dynamic options for drinking bottle/glass/cups
 - [ ] User management using firebase
 - [ ] Find best practice for unit testing
-- [ ] Add reminder for user to drink water
+- [x] Add reminder for user to drink water
 - [ ] Create unit test
 - [ ] Create instrumentation test (unit test first to test business logic)
 

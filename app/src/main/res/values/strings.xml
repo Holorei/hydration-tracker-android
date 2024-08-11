@@ -10,4 +10,6 @@
     <string name="settings_goal_amount">Goals Amount</string>
     <string name="settings_edit_goal_amount">Edit Goals Amount</string>
     <string name="settings">Settings</string>
+
+    <string name="settings_notifications">Notifications</string>
 </resources>

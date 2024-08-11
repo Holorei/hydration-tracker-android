@@ -3,9 +3,7 @@ package com.andriawan.hydrationtracker.ui.screens.settings
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -14,7 +12,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.andriawan.hydrationtracker.R
-import com.andriawan.hydrationtracker.theme.HydrationTrackerTheme
 import com.andriawan.hydrationtracker.ui.components.DialogEditValue
 import com.andriawan.hydrationtracker.ui.components.Setting
 import com.andriawan.hydrationtracker.ui.components.SettingHeader
@@ -25,6 +22,8 @@ fun SettingsScreen(
 ) {
     val state = viewModel.state
     var showDialog by remember { mutableStateOf(false) }
+    var showIntervalDialog by remember { mutableStateOf(false) }
+    var intervalInput by remember { mutableStateOf((state.notificationInterval / (60 * 1000)).toString()) }
 
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -38,6 +37,20 @@ fun SettingsScreen(
                     value = state.dailyGoals.toString(),
                     onItemClicked = {
                         showDialog = !showDialog
+                    }
+                )
+                Setting(
+                    title = stringResource(id = R.string.settings_notifications),
+                    value = if (state.isNotificationEnabled) "Enabled" else "Disabled",
+                    onItemClicked = {
+                        viewModel.toggleNotifications(!state.isNotificationEnabled)
+                    }
+                )
+                Setting(
+                    title = "Notification Interval",
+                    value = "${state.notificationInterval / (60 * 1000)} minutes",
+                    onItemClicked = {
+                        showIntervalDialog = !showIntervalDialog
                     }
                 )
             }
@@ -58,41 +71,31 @@ fun SettingsScreen(
             }
         )
     }
+
+    if (showIntervalDialog) {
+        DialogEditValue(
+            title = "Set Notification Interval (in minutes)",
+            value = intervalInput,
+            onSubmit = {
+                val newInterval = it.toLongOrNull()?.times(60 * 1000) ?: state.notificationInterval
+                viewModel.setNotificationInterval(newInterval)
+                intervalInput = (newInterval / (60 * 1000)).toString()
+                showIntervalDialog = false
+            },
+            onDismiss = {
+                showIntervalDialog = false
+            }
+        )
+    }
 }
+
+
 
 @Composable
 fun SettingsPageTopBar() {
-    Text(
-        text = stringResource(id = R.string.settings),
-        style = MaterialTheme.typography.h1,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(18.dp),
-        textAlign = TextAlign.Center
+    TopAppBar(
+        title = {
+            Text(text = stringResource(id = R.string.settings))
+        }
     )
 }
-
-@Preview
-@Composable
-fun SettingsScreenPreview() {
-    HydrationTrackerTheme {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            SettingsScreen()
-        }
-    }
-}
-
-@Preview(uiMode = UI_MODE_NIGHT_YES)
-@Composable
-fun SettingsScreenPreviewDarkMode() {
-    HydrationTrackerTheme {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colors.background)
-        ) {
-            SettingsScreen()
-        }
-    }
-}
-
